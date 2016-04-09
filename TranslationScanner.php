@@ -12,6 +12,9 @@
  */
 class TranslationScanner
 {
+	private $component;
+	private $path;
+
 	protected $usedAdmin = array();
 	protected $usedSite  = array();
 
@@ -29,14 +32,51 @@ class TranslationScanner
 
 	private $languages = array();
 
+	private $error;
+
 	/**
 	 * TranslationScanner constructor.
 	 *
 	 * @param $extensionName
 	 */
-	public function __construct($extensionName)
+	public function __construct($extensionName, $path = '')
 	{
 		$this->extensionName = $extensionName;
+
+		if (empty($path))
+		{
+			$path = __DIR__ . '/' . $extensionName;
+		}
+
+		$this->path = $path;
+
+		if ($installFile = $this->findInstallFile())
+		{
+			$xml = simplexml_load_file($path . '/' . $installFile);
+
+			$this->component = ($xml['type'] == 'component');
+		}
+		else
+		{
+			$this->error = 'No XML installation file found.';
+		}
+	}
+
+	private function findInstallFile()
+	{
+		$files = scandir($this->path);
+		$split = explode('_', $this->extensionName);
+		$pattern = $split[count($split) - 1] . '.xml';
+
+		foreach ($files as $file)
+		{
+			if (substr($file, -strlen($pattern)) === $pattern)
+			{
+				return $file;
+			}
+		}
+
+		return null;
 	}
 
 	public function scanDirectory($path, $ending)
@@ -165,44 +205,64 @@ class TranslationScanner
 		return $strings;
 	}
 
-	public function scanAll($basePath)
+	public function scanAll()
 	{
-		$this->usedAdmin = $this->sortUnique(
-			array_merge(
-				$this->scanDirectory($basePath . '/admin', '.php'),
-				$this->scanDirectory($basePath . '/admin', '.xml'),
-				$this->scanDirectory($basePath . '/site', '.xml')
-			)
-		);
-		$this->usedSite = $this->sortUnique(
-			array_merge(
-				$this->scanDirectory($basePath . '/site', '.php'),
-				$this->scanDirectory($basePath . '/admin/model/forms', '.xml')
-			)
-		);
-
-		if (is_dir($basePath . '/admin/language'))
+		if (!is_dir($this->path))
 		{
-			$this->languageAdmin = $this->scanLanguages($basePath . '/admin/language');
+			$this->error = 'Invalid path supplied: ' . $this->path . ' is not a directory.';
+		}
 
-			// TODO .sys.ini
+		if ($this->component)
+		{
+			$this->usedAdmin = $this->sortUnique(
+				array_merge(
+					$this->scanDirectory($this->path . '/admin', '.php'),
+					$this->scanDirectory($this->path . '/admin', '.xml'),
+					$this->scanDirectory($this->path . '/site', '.xml')
+				)
+			);
+			$this->usedSite  = $this->sortUnique(
+				array_merge(
+					$this->scanDirectory($this->path . '/site', '.php'),
+					$this->scanDirectory($this->path . '/admin/model/forms', '.xml')
+				)
+			);
+
+			if (is_dir($this->path . '/admin/language'))
+			{
+				$this->languageAdmin = $this->scanLanguages($this->path . '/admin/language');
+
+				// TODO .sys.ini
+			}
+			else
+			{
+				// TODO
+			}
+
+			if (is_dir($this->path . '/site/language'))
+			{
+				$this->languageSite = $this->scanLanguages($this->path . '/site/language');
+			}
+			else
+			{
+				// TODO
+			}
+
+			$this->compareStrings($this->languageAdmin, $this->usedAdmin, $this->missingAdmin, $this->unusedAdmin);
+			$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite);
 		}
 		else
 		{
-			// TODO
-		}
+			$this->usedSite  = $this->sortUnique(
+				array_merge(
+					$this->scanDirectory($this->path, '.php'),
+					$this->scanDirectory($this->path, '.xml')
+				)
+			);
 
-		if (is_dir($basePath . '/site/language'))
-		{
-			$this->languageSite = $this->scanLanguages($basePath . '/site/language');
+			$this->languageSite = $this->scanLanguages($this->path . '/language');
+			$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite);
 		}
-		else
-		{
-			// TODO
-		}
-
-		$this->compareStrings($this->languageAdmin, $this->usedAdmin, $this->missingAdmin, $this->unusedAdmin);
-		$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite);
 	}
 
 	private function sortUnique($array)
@@ -349,5 +409,21 @@ class TranslationScanner
 	public function getLanguages()
 	{
 		return $this->languages;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getError()
+	{
+		return $this->error;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isComponent()
+	{
+		return $this->component;
 	}
 }

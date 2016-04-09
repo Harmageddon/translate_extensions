@@ -1,24 +1,42 @@
 <?php
 require_once 'TranslationScanner.php';
 
-$scanner = new TranslationScanner('com_monitor');
+if (isset($_GET['extension']))
+{
+	$scanner = new TranslationScanner($_GET['extension']);
+	$scanner->scanAll();
 
-$scanner->scanAll(__DIR__ . '/com_monitor');
+	$title = 'Scan results for ' . $_GET['extension'];
+}
+else
+{
+	$title = 'Translation Scanner';
+}
 ?>
 <!doctype html>
 <html>
 <head>
-	<title>Scan results for <?php echo $scanner->getExtensionName(); ?></title>
+	<title><?php echo $title; ?></title>
+	<script src="js/jquery-2.2.3.min.js"></script>
+	<script src="js/script.js"></script>
 </head>
 <body>
-<h1>Scan results for <?php echo $scanner->getExtensionName(); ?></h1>
+<h1><?php echo $title; ?></h1>
+<?php if (isset($scanner)) :?>
+<?php if ($scanner->getError()) : ?>
+<h2>Error</h2>
+<p>
+	<?php echo $scanner->getError(); ?>
+</p>
+<?php else : ?>
 <h2>Language files</h2>
-<h3>Administrator</h3>
 <table>
 	<thead>
 	<tr>
 		<th>Language</th>
-		<th>Administrator</th>
+		<?php if ($scanner->isComponent()) : ?>
+			<th>Administrator</th>
+		<?php endif; ?>
 		<th>Site</th>
 	</tr>
 	</thead>
@@ -29,13 +47,16 @@ $scanner->scanAll(__DIR__ . '/com_monitor');
 		echo '<tr><td>' . $language . '</td><td>';
 		echo '<ul>';
 
-		foreach ($scanner->getLanguageAdmin()[$language] as $file => $strings)
+		if ($scanner->isComponent())
 		{
-			echo '<li>' . $file . ' (' . count($strings) . ' strings)' . '</li>';
-		}
+			foreach ($scanner->getLanguageAdmin()[$language] as $file => $strings)
+			{
+				echo '<li>' . $file . ' (' . count($strings) . ' strings)' . '</li>';
+			}
 
-		echo '</ul></td>';
-		echo '<td><ul>';
+			echo '</ul></td>';
+			echo '<td><ul>';
+		}
 
 		foreach ($scanner->getLanguageSite()[$language] as $file => $strings)
 		{
@@ -54,7 +75,9 @@ $scanner->scanAll(__DIR__ . '/com_monitor');
 	<thead>
 	<tr>
 		<th>Language</th>
-		<th>Administrator</th>
+		<?php if ($scanner->isComponent()) : ?>
+			<th>Administrator</th>
+		<?php endif; ?>
 		<th>Site</th>
 	</tr>
 	</thead>
@@ -66,23 +89,26 @@ $scanner->scanAll(__DIR__ . '/com_monitor');
 		echo '<td>' . $language . '</td>';
 		echo '<td>';
 
-		if (empty($scanner->getMissingAdmin()[$language]))
+		if ($scanner->isComponent())
 		{
-			echo '<p>Congratulations! No strings are missing.</p>';
-		}
-		else
-		{
-			echo '<ul>';
-
-			foreach ($scanner->getMissingAdmin()[$language] as $string)
+			if (empty($scanner->getMissingAdmin()[$language]))
 			{
-				echo '<li>' . $string . '</li>';
+				echo '<p>Congratulations! No strings are missing.</p>';
+			}
+			else
+			{
+				echo '<ul>';
+
+				foreach ($scanner->getMissingAdmin()[$language] as $string)
+				{
+					echo '<li>' . $string . '</li>';
+				}
+
+				echo '</ul>';
 			}
 
-			echo '</ul>';
+			echo '</td><td>';
 		}
-
-		echo '</td><td>';
 
 		if (empty($scanner->getMissingSite()[$language]))
 		{
@@ -111,7 +137,9 @@ $scanner->scanAll(__DIR__ . '/com_monitor');
 	<thead>
 	<tr>
 		<th>Language</th>
-		<th>Administrator</th>
+		<?php if ($scanner->isComponent()) : ?>
+			<th>Administrator</th>
+		<?php endif; ?>
 		<th>Site</th>
 	</tr>
 	</thead>
@@ -123,35 +151,34 @@ $scanner->scanAll(__DIR__ . '/com_monitor');
 		echo '<td>' . $language . '</td>';
 		echo '<td>';
 
-		if (empty($scanner->getUnusedAdmin()[$language]))
+		if ($scanner->isComponent())
 		{
-			echo '<p>Congratulations! No unused strings found.</p>';
-		}
-		else
-		{
-			echo '<ul>';
-
-			foreach ($scanner->getUnusedAdmin()[$language] as $file => $strings)
+			if (empty($scanner->getUnusedAdmin()[$language]))
 			{
-				echo '<li>' . $file . '<ul>';
+				echo '<p>Congratulations! No unused strings found.</p>';
+			}
+			else
+			{
+				echo '<ul>';
 
-				foreach ($strings as $string)
+				foreach ($scanner->getUnusedAdmin()[$language] as $file => $strings)
 				{
-					echo '<li>' . $string . '</li>';
+					echo '<li>' . $file . '<ul>';
+
+					foreach ($strings as $string)
+					{
+						echo '<li>' . $string . '</li>';
+					}
+
+					echo '</ul></li>';
 				}
 
-				echo '</ul></li>';
+				echo '</ul>';
 			}
 
-			echo '</ul>';
+			echo '</td><td>';
 		}
 
-		echo '</td><td>';
-
-		if (empty($scanner->getUnusedSite()[$language]))
-		{
-			echo '<p>Congratulations! No unused strings found.</p>';
-		}
 		else
 		{
 			echo '<ul>';
@@ -159,6 +186,11 @@ $scanner->scanAll(__DIR__ . '/com_monitor');
 			foreach ($scanner->getUnusedSite()[$language] as $file => $strings)
 			{
 				echo '<li>' . $file . '<ul>';
+
+				if (empty($strings))
+				{
+					echo '<li>Congratulations! No unused strings found.</li>';
+				}
 
 				foreach ($strings as $string)
 				{
@@ -174,5 +206,12 @@ $scanner->scanAll(__DIR__ . '/com_monitor');
 	?>
 	</tbody>
 </table>
+<?php endif; ?>
+<?php endif; ?>
+<form action="" method="get">
+	<label for="extension">Extension name:</label>
+	<input type="text" name="extension" id="extension" />
+	<button type="submit">Load translation information</button>
+</form>
 </body>
 </html>
