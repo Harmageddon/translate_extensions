@@ -19,6 +19,7 @@ else
 	<title><?php echo $title; ?></title>
 	<script src="js/jquery-2.2.3.min.js"></script>
 	<script src="js/script.js"></script>
+	<link href="css/main.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <h1><?php echo $title; ?></h1>
@@ -124,6 +125,18 @@ else
 			}
 
 			echo '</ul>';
+
+			$className = 'missing-site-' . $language;
+
+			echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
+			echo '<pre id="' . $className . '" class="hide">';
+
+			foreach ($scanner->getMissingSite()[$language] as $string)
+			{
+				echo $string . "=\"\"\n";
+			}
+
+			echo '</pre>';
 		}
 
 		echo '</td></tr>';
