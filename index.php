@@ -46,25 +46,46 @@ else
 	foreach ($scanner->getLanguages() as $language)
 	{
 		echo '<tr><td>' . $language . '</td><td>';
-		echo '<ul>';
 
 		if ($scanner->isComponent())
 		{
-			foreach ($scanner->getLanguageAdmin()[$language] as $file => $strings)
+			if (is_array($scanner->getLanguageAdmin()[$language]))
+			{
+				echo '<ul>';
+
+				foreach ($scanner->getLanguageAdmin()[$language] as $file => $strings)
+				{
+					echo '<li>' . $file . ' (' . count($strings) . ' strings)' . '</li>';
+				}
+
+				echo '</ul>';
+			}
+			else
+			{
+				echo 'No files found.';
+			}
+
+			echo '</td><td>';
+		}
+
+		if (is_array($scanner->getLanguageSite()[$language]))
+		{
+			echo '<ul>';
+
+			foreach ($scanner->getLanguageSite()[$language] as $file => $strings)
 			{
 				echo '<li>' . $file . ' (' . count($strings) . ' strings)' . '</li>';
 			}
 
-			echo '</ul></td>';
-			echo '<td><ul>';
+			echo '</ul>';
 		}
-
-		foreach ($scanner->getLanguageSite()[$language] as $file => $strings)
+		else
 		{
-			echo '<li>' . $file . ' (' . count($strings) . ' strings)' . '</li>';
+			echo 'No files found.';
 		}
 
-		echo '</ul></td>';
+
+		echo '</td>';
 		echo '</tr>';
 	}
 	?>

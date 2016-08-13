@@ -231,6 +231,7 @@ class TranslationScanner
 			if (is_dir($this->path . '/admin/language'))
 			{
 				$this->languageAdmin = $this->scanLanguages($this->path . '/admin/language');
+				$this->compareStrings($this->languageAdmin, $this->usedAdmin, $this->missingAdmin, $this->unusedAdmin);
 
 				// TODO .sys.ini
 			}
@@ -242,14 +243,12 @@ class TranslationScanner
 			if (is_dir($this->path . '/site/language'))
 			{
 				$this->languageSite = $this->scanLanguages($this->path . '/site/language');
+				$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite);
 			}
 			else
 			{
 				// TODO
 			}
-
-			$this->compareStrings($this->languageAdmin, $this->usedAdmin, $this->missingAdmin, $this->unusedAdmin);
-			$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite);
 		}
 		else
 		{
