@@ -45,10 +45,15 @@ class TranslationScanner
 
 		if (empty($path))
 		{
-			$path = __DIR__ . '/' . $extensionName;
+			$path = __DIR__ . '/extensions/' . $extensionName;
 		}
 
 		$this->path = $path;
+
+		if (!is_dir($path))
+		{
+			return;
+		}
 
 		if ($installFile = $this->findInstallFile())
 		{
@@ -62,15 +67,37 @@ class TranslationScanner
 		}
 	}
 
-	private function findInstallFile()
+	private function findInstallFile($dir = '')
 	{
-		$files = scandir($this->path);
+		$files = scandir($this->path . '/' . $dir);
 		$split = explode('_', $this->extensionName);
 		$pattern = $split[count($split) - 1] . '.xml';
 
 		foreach ($files as $file)
 		{
 			if (substr($file, -strlen($pattern)) === $pattern)
+			{
+				if ($dir != '')
+				{
+					$file = $dir . '/' . $file;
+				}
+
+				return $file;
+			}
+		}
+
+		if ($dir == '')
+		{
+			$file = $this->findInstallFile('admin');
+
+			if ($file)
+			{
+				return $file;
+			}
+
+			$file = $this->findInstallFile('site');
+
+			if ($file)
 			{
 				return $file;
 			}
