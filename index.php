@@ -244,7 +244,21 @@ else
 <?php endif; ?>
 <form action="" method="get">
 	<label for="extension">Extension name:</label>
-	<input type="text" name="extension" id="extension" />
+	<input type="text" name="extension" id="extension" list="extensions" />
+	<datalist id="extensions">
+		<?php
+		$dir = __DIR__ . '/extensions/';
+		$files = scandir($dir);
+
+		foreach ($files as $file)
+		{
+			if ($file != '.' && $file != '..' && is_dir($dir . $file))
+			{
+				echo '<option>' . $file . '</option>';
+			}
+		}
+		?>
+	</datalist>
 	<button type="submit">Load translation information</button>
 </form>
 </body>
