@@ -222,7 +222,7 @@ class TranslationScanner
 			return array();
 		}
 
-		$pattern = "/" . strtoupper($this->extensionName) . "_[A-Z_]+/";
+		$pattern = "/" . strtoupper($this->extensionName) . "_[A-Z_0-9]+/";
 
 		if (preg_match_all($pattern, $content, $matches))
 		{
@@ -309,7 +309,7 @@ class TranslationScanner
 			return array();
 		}
 
-		$pattern = "/^(" . strtoupper($this->extensionName) . "_[A-Z_]+)=/";
+		$pattern = "/^(" . strtoupper($this->extensionName) . "_[A-Z_0-9]+)=/";
 
 		while (($line = fgets($handle)) !== false)
 		{
