@@ -12,6 +12,19 @@ else
 {
 	$title = 'Translation Scanner';
 }
+
+$thead = '<thead><tr><th width="10%">Language</th>';
+
+if ($scanner->isComponent())
+{
+	$thead .= '<th width="45%">Administrator</th><th width="45%">Site</th>';
+}
+else
+{
+	$thead .= '<th width="90%">Site</th>';
+}
+
+$thead .= '</tr></thead>';
 ?>
 <!doctype html>
 <html>
@@ -32,15 +45,7 @@ else
 <?php else : ?>
 <h2>Language files</h2>
 <table>
-	<thead>
-	<tr>
-		<th>Language</th>
-		<?php if ($scanner->isComponent()) : ?>
-			<th>Administrator</th>
-		<?php endif; ?>
-		<th>Site</th>
-	</tr>
-	</thead>
+	<?php echo $thead; ?>
 	<tbody>
 	<?php
 	foreach ($scanner->getLanguages() as $language)
@@ -94,15 +99,7 @@ else
 
 <h2>Missing strings</h2>
 <table>
-	<thead>
-	<tr>
-		<th>Language</th>
-		<?php if ($scanner->isComponent()) : ?>
-			<th>Administrator</th>
-		<?php endif; ?>
-		<th>Site</th>
-	</tr>
-	</thead>
+	<?php echo $thead; ?>
 	<tbody>
 	<?php
 	foreach ($scanner->getLanguages() as $language)
@@ -180,15 +177,7 @@ else
 
 <h2>Unused strings</h2>
 <table>
-	<thead>
-	<tr>
-		<th>Language</th>
-		<?php if ($scanner->isComponent()) : ?>
-			<th>Administrator</th>
-		<?php endif; ?>
-		<th>Site</th>
-	</tr>
-	</thead>
+	<?php echo $thead; ?>
 	<tbody>
 	<?php
 	foreach ($scanner->getLanguages() as $language)

@@ -1,6 +1,39 @@
+body {
+	margin: 0;
+	padding: .5em;
+	font-family: sans-serif;
+}
+
 .hide {
 	display: none;
 }
 table {
 	width: 100%;
+	border-collapse: collapse;
+}
+
+thead tr {
+	background-color: #ddd;
+}
+th {
+	padding: .5em;
+	border: 1px solid #bbb;
+}
+td {
+	padding: .3em;
+	border: 1px solid #ccc;
+}
+tbody tr:nth-child(2n) {
+	background-color: #e5e5e5;
+}
+tbody tr:nth-child(2n+1) {
+	background-color: #f0f0f0;
+}
+
+h2 {
+	margin: 1em 0 .5em;
+}
+
+form {
+	margin: .5em 0;
 }
