@@ -127,6 +127,18 @@ else
 				}
 
 				echo '</ul>';
+
+				$className = 'missing-admin-' . $language;
+
+				echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
+				echo '<pre id="' . $className . '" class="hide">';
+
+				foreach ($scanner->getMissingAdmin()[$language] as $string)
+				{
+					echo $string . "=\"\"\n";
+				}
+
+				echo '</pre>';
 			}
 
 			echo '</td><td>';
