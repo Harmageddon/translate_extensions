@@ -7,24 +7,24 @@ if (isset($_GET['extension']))
 	$scanner->scanAll();
 
 	$title = 'Scan results for ' . $_GET['extension'];
+
+	$thead = '<thead><tr><th width="10%">Language</th>';
+
+	if ($scanner->isComponent())
+	{
+		$thead .= '<th width="45%">Administrator</th><th width="45%">Site</th>';
+	}
+	else
+	{
+		$thead .= '<th width="90%">Site</th>';
+	}
+
+	$thead .= '</tr></thead>';
 }
 else
 {
 	$title = 'Translation Scanner';
 }
-
-$thead = '<thead><tr><th width="10%">Language</th>';
-
-if ($scanner->isComponent())
-{
-	$thead .= '<th width="45%">Administrator</th><th width="45%">Site</th>';
-}
-else
-{
-	$thead .= '<th width="90%">Site</th>';
-}
-
-$thead .= '</tr></thead>';
 ?>
 <!doctype html>
 <html>
