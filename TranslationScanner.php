@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright  2015 Constantin Romankiewicz
+ * @copyright  2015 Constantin Romankiewicz <constantin@zweiiconkram.de>
  * @license    Apache License 2.0; see LICENSE
  */
 
@@ -12,6 +12,11 @@
  */
 class TranslationScanner
 {
+	/**
+	 * @var   string  The default base directory containing the extensions.
+	 */
+	public static $basePath = __DIR__ . '/extensions/';
+
 	private $component;
 	private $path;
 
@@ -37,7 +42,10 @@ class TranslationScanner
 	/**
 	 * TranslationScanner constructor.
 	 *
-	 * @param $extensionName
+	 * @param   string  $extensionName  Identifier of the extension to be scanned.
+	 *
+	 * @param   string  $path           Location of the extension folder (optional).
+	 *                                  If left empty, the extension should be in a sub-folder of the $baseFolder.
 	 */
 	public function __construct($extensionName, $path = '')
 	{
@@ -67,171 +75,11 @@ class TranslationScanner
 		}
 	}
 
-	private function findInstallFile($dir = '')
-	{
-		$files = scandir($this->path . '/' . $dir);
-		$split = explode('_', $this->extensionName);
-		$pattern = $split[count($split) - 1] . '.xml';
-
-		foreach ($files as $file)
-		{
-			if (substr($file, -strlen($pattern)) === $pattern)
-			{
-				if ($dir != '')
-				{
-					$file = $dir . '/' . $file;
-				}
-
-				return $file;
-			}
-		}
-
-		if ($dir == '')
-		{
-			$file = $this->findInstallFile('admin');
-
-			if ($file)
-			{
-				return $file;
-			}
-
-			$file = $this->findInstallFile('site');
-
-			if ($file)
-			{
-				return $file;
-			}
-		}
-
-		return null;
-	}
-
-	public function scanDirectory($path, $ending)
-	{
-		$strings = array();
-
-		if (is_dir($path))
-		{
-			if ($dh = opendir($path))
-			{
-				while (($file = readdir($dh)) !== false)
-				{
-					if ($file === '.' || $file === '..')
-					{
-						continue;
-					}
-
-					$filePath = $path . '/' . $file;
-
-					if (is_dir($filePath))
-					{
-						$strings = array_merge($strings, $this->scanDirectory($filePath, $ending));
-					}
-					elseif (substr($file, -strlen($ending)) === $ending)
-					{
-						$strings = array_merge($strings, $this->scanCodeFile($filePath));
-					}
-				}
-
-				closedir($dh);
-			}
-		}
-
-		return $strings;
-	}
-
-	public function scanLanguages($path, $sys = false)
-	{
-		$strings = array();
-
-		if (!is_dir($path))
-		{
-			return array();
-		}
-
-		if ($dh = opendir($path))
-		{
-			while (($folder = readdir($dh)) !== false)
-			{
-				if ($folder === '.' || $folder === '..')
-				{
-					continue;
-				}
-
-				$folderPath = $path . '/' . $folder;
-
-				if (is_dir($folderPath))
-				{
-					if (!in_array($folder, $this->languages))
-					{
-						array_push($this->languages, $folder);
-					}
-
-					$strings[$folder] = $this->scanLanguage($folderPath, $folder, $sys);
-				}
-			}
-
-			closedir($dh);
-		}
-
-		return $strings;
-	}
-
-	public function scanLanguage($path, $language, $sys = false)
-	{
-		$fileName = $language . '.' . $this->extensionName . ($sys ? '.sys' : '') . '.ini';
-
-		$strings = array();
-
-		if (!is_dir($path))
-		{
-			return array();
-		}
-
-		if ($dh = opendir($path))
-		{
-			while (($file = readdir($dh)) !== false)
-			{
-				if ($file === '.' || $file === '..')
-				{
-					continue;
-				}
-
-				$filePath = $path . '/' . $file;
-
-				if (is_file($filePath) && $file === $fileName)
-				{
-					$strings[$file] = $this->scanLangFile($filePath);
-				}
-			}
-
-			closedir($dh);
-		}
-
-		return $strings;
-	}
-
-	private function scanCodeFile($file)
-	{
-		$strings = array();
-
-		$content = file_get_contents($file);
-
-		if (!$content)
-		{
-			return array();
-		}
-
-		$pattern = "/" . strtoupper($this->extensionName) . "_[A-Z_0-9]+/";
-
-		if (preg_match_all($pattern, $content, $matches))
-		{
-			$strings = $matches[0];
-		}
-
-		return $strings;
-	}
-
+	/**
+	 * Scans all code and language files inside the extension directory and analyzes the language strings.
+	 *
+	 * @return void
+	 */
 	public function scanAll()
 	{
 		if (!is_dir($this->path))
@@ -291,6 +139,221 @@ class TranslationScanner
 		}
 	}
 
+	/**
+	 * Recursively searches for code files in a directory.
+	 *
+	 * @param   string  $path    Directory to be searched.
+	 * @param   string  $ending  File ending of the files to be returned.
+	 *
+	 * @return   array  One-dimensional array containing the paths to all files that have been found.
+	 */
+	public function scanDirectory($path, $ending)
+	{
+		$strings = array();
+
+		if (is_dir($path))
+		{
+			if ($dh = opendir($path))
+			{
+				while (($file = readdir($dh)) !== false)
+				{
+					if ($file === '.' || $file === '..')
+					{
+						continue;
+					}
+
+					$filePath = $path . '/' . $file;
+
+					if (is_dir($filePath))
+					{
+						$strings = array_merge($strings, $this->scanDirectory($filePath, $ending));
+					}
+					elseif (substr($file, -strlen($ending)) === $ending)
+					{
+						$strings = array_merge($strings, $this->scanCodeFile($filePath));
+					}
+				}
+
+				closedir($dh);
+			}
+		}
+
+		return $strings;
+	}
+
+	/**
+	 * Scans all language files inside a given path.
+	 *
+	 * @param   string   $path  Path to the directory containing the language files.
+	 * @param   boolean  $sys   Whether to include .sys.ini files or not (default: false).
+	 *
+	 * @return  array  Associative array with the key being the subfolder of the language files (typically the language key)
+	 *                 and the value being the language strings, grouped by file.
+	 */
+	public function scanLanguages($path, $sys = false)
+	{
+		$strings = array();
+
+		if (!is_dir($path))
+		{
+			return array();
+		}
+
+		if ($dh = opendir($path))
+		{
+			while (($folder = readdir($dh)) !== false)
+			{
+				if ($folder === '.' || $folder === '..')
+				{
+					continue;
+				}
+
+				$folderPath = $path . '/' . $folder;
+
+				if (is_dir($folderPath))
+				{
+					if (!in_array($folder, $this->languages))
+					{
+						array_push($this->languages, $folder);
+					}
+
+					$strings[$folder] = $this->scanLanguage($folderPath, $folder, $sys);
+				}
+			}
+
+			closedir($dh);
+		}
+
+		return $strings;
+	}
+
+	/**
+	 * Scans the language files of a single language.
+	 *
+	 * @param   string   $path      Path to the directory containing the language files.
+	 * @param   string   $language  Language key.
+	 * @param   boolean  $sys       Whether to include .sys.ini files or not (default: false).
+	 *
+	 * @return  array  Associative array with the key being the language file and the value an array of language strings.
+	 */
+	public function scanLanguage($path, $language, $sys = false)
+	{
+		$fileName = $language . '.' . $this->extensionName . ($sys ? '.sys' : '') . '.ini';
+
+		$strings = array();
+
+		if (!is_dir($path))
+		{
+			return array();
+		}
+
+		if ($dh = opendir($path))
+		{
+			while (($file = readdir($dh)) !== false)
+			{
+				if ($file === '.' || $file === '..')
+				{
+					continue;
+				}
+
+				$filePath = $path . '/' . $file;
+
+				if (is_file($filePath) && $file === $fileName)
+				{
+					$strings[$file] = $this->scanLangFile($filePath);
+				}
+			}
+
+			closedir($dh);
+		}
+
+		return $strings;
+	}
+
+	/**
+	 * Searches for an installation XML manifest in the given directory.
+	 *
+	 * @param   string  $dir  Directory containing the XML manifest, relative to the base path of the extension (optional).
+	 *
+	 * @return null|string  Path to the installation manifest file, relative to the base path of the extension.
+	 *                      Null if no installation manifest could be found.
+	 */
+	private function findInstallFile($dir = '')
+	{
+		$files = scandir($this->path . '/' . $dir);
+		$split = explode('_', $this->extensionName);
+		$pattern = $split[count($split) - 1] . '.xml';
+
+		foreach ($files as $file)
+		{
+			if (substr($file, -strlen($pattern)) === $pattern)
+			{
+				if ($dir != '')
+				{
+					$file = $dir . '/' . $file;
+				}
+
+				return $file;
+			}
+		}
+
+		if ($dir == '')
+		{
+			$file = $this->findInstallFile('admin');
+
+			if ($file)
+			{
+				return $file;
+			}
+
+			$file = $this->findInstallFile('site');
+
+			if ($file)
+			{
+				return $file;
+			}
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * Scans a given code file for language strings.
+	 * The language strings have to be in the format EXTENSION_IDENTIFIER_SOMETHING, e.g. COM_MYCOMPONENT_ERROR_NO_FILE.
+	 *
+	 * @param   string  $file  Path to the file.
+	 *
+	 * @return   array  All found language strings.
+	 */
+	private function scanCodeFile($file)
+	{
+		$strings = array();
+
+		$content = file_get_contents($file);
+
+		if (!$content)
+		{
+			return array();
+		}
+
+		$pattern = "/" . strtoupper($this->extensionName) . "_[A-Z_0-9]+/";
+
+		if (preg_match_all($pattern, $content, $matches))
+		{
+			$strings = $matches[0];
+		}
+
+		return $strings;
+	}
+
+	/**
+	 * Sorts an array and removes duplicated values.
+	 *
+	 * @param   array  $array  The array to operate on.
+	 *
+	 * @return  array  A sorted and unique version of the array.
+	 */
 	private function sortUnique($array)
 	{
 		sort($array);
@@ -298,6 +361,13 @@ class TranslationScanner
 		return array_unique($array);
 	}
 
+	/**
+	 * Scans a single language file for translated language strings.
+	 *
+	 * @param   string  $file  Path to the language file.
+	 *
+	 * @return  array  All translated language strings contained in the file.
+	 */
 	private function scanLangFile($file)
 	{
 		$strings = array();
@@ -330,7 +400,21 @@ class TranslationScanner
 	}
 
 	/**
-	 * @param $languageFiles
+	 * Compares the language strings found in the code base with those translated in the language files.
+	 *
+	 * @param   array  $languageFiles  Associative array in the form:
+	 *                                 array(
+	 *                                      'en-GB' => array(
+	 *                                         'en-GB.com_something.ini => array(language strings),
+	 *                                          ...
+	 *                                      ),
+	 *                                      ...
+	 *                                 )
+	 * @param   array  $used           Array containing all strings used in the code base.
+	 * @param   array  $missing        Reference to an array where the function inserts all untranslated strings.
+	 * @param   array  $unused         Reference to an array where the function inserts all translated strings not used in the code base.
+	 *
+	 * @return   void  Values are returned by reference in the parameters.
 	 */
 	private function compareStrings($languageFiles, $used, &$missing, &$unused)
 	{

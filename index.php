@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright  2015 Constantin Romankiewicz <constantin@zweiiconkram.de>
+ * @license    Apache License 2.0; see LICENSE
+ */
 require_once 'TranslationScanner.php';
 
 if (isset($_GET['extension']))
