@@ -99,7 +99,10 @@ class TranslationScanner
 			$this->usedSite  = $this->sortUnique(
 				array_merge(
 					$this->scanDirectory($this->path . '/site', '.php'),
-					$this->scanDirectory($this->path . '/admin/model/forms', '.xml')
+					$this->scanDirectory($this->path . '/admin/model/field', '.xml'),
+					$this->scanDirectory($this->path . '/admin/model/form', '.xml'),
+					$this->scanDirectory($this->path . '/admin/models/fields', '.xml'),
+					$this->scanDirectory($this->path . '/admin/models/forms', '.xml')
 				)
 			);
 

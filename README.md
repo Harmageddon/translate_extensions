@@ -40,7 +40,11 @@ The strings for the `admin` part are those found at these parts of the code base
 The strings for the `site` part are those found at these parts of the code base:
 
 - `.php` files inside the `site` directory
-- `.xml` files inside the `admin/model/forms` directory, because they might contain parameters used in frontend forms
+- `.xml` files inside the following directories, because they might contain parameters used in frontend forms:
+  - `admin/model/field`
+  - `admin/model/form`
+  - `admin/models/fields`
+  - `admin/models/forms`
 
 ## Please note...
 
