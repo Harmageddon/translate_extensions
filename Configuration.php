@@ -124,6 +124,32 @@ class Configuration
 		if (!in_array($string, $this->config[$extension]['hidden'][$scope]))
 		{
 			array_push($this->config[$extension]['hidden'][$scope], $string);
+
+			sort($this->config[$extension]['hidden'][$scope]);
+		}
+	}
+
+	/**
+	 * Shows a given language string, allowing again to it being displayed as unused or missing.
+	 *
+	 * @param   string  $extension  Extension identifier.
+	 * @param   string  $string     The language string to hide.
+	 * @param   string  $scope      Either 'site' or 'admin'. Defaults to 'site'.
+	 *
+	 * @return void
+	 */
+	public function showString($extension, $string, $scope = 'site')
+	{
+		if (!isset($this->config[$extension]) || !isset($this->config[$extension]['hidden']) || !isset($this->config[$extension]['hidden'][$scope]))
+		{
+			return;
+		}
+
+		if (($index = array_search($string, $this->config[$extension]['hidden'][$scope])) !== false)
+		{
+			unset($this->config[$extension]['hidden'][$scope][$index]);
+
+			$this->config[$extension]['hidden'][$scope] = array_values($this->config[$extension]['hidden'][$scope]);
 		}
 	}
 

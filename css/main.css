@@ -66,11 +66,13 @@ form {
 	box-shadow: none;
 }
 
-.btn-hide {
+.btn-hide,
+.btn-show {
 	color: #666;
 	transition: color 0.3s ease;
 }
 
-.btn-hide:hover {
+.btn-hide:hover,
+.btn-show:hover {
 	color: #000;
 }

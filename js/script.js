@@ -31,4 +31,22 @@ $(document).ready(function () {
 				}
 			});
 	});
+
+	$('.btn-show').click(function () {
+		$.ajax({
+			url: 'ajax.php',
+			data: {
+				action: 'show',
+				extension: extensionName,
+				scope: $(this).data('scope'),
+				value: $(this).data('string')
+			}
+		})
+			.done(function (data) {
+				if (data === '')
+				{
+					window.location.reload();
+				}
+			});
+	});
 });

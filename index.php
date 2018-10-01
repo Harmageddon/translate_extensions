@@ -52,6 +52,8 @@ else
 	<?php echo $scanner->getError(); ?>
 </p>
 <?php else : ?>
+<a href="configuration.php?extension=<?php echo $_GET['extension']; ?>">Configuration</a>
+
 <h2>Language files</h2>
 <table>
 	<?php echo $thead; ?>

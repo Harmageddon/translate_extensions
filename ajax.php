@@ -18,4 +18,14 @@ switch ($action)
 		$config->hideString($extension, $value, $scope);
 		$config->save();
 		break;
+	case 'show':
+		$extension = filter_var($_GET['extension'], FILTER_SANITIZE_STRING);
+		$scope = filter_var($_GET['scope'], FILTER_SANITIZE_STRING);
+		$value = filter_var($_GET['value'], FILTER_SANITIZE_STRING);
+		$config->showString($extension, $value, $scope);
+		$config->save();
+		break;
+
+	default:
+		echo 'Invalid action.';
 }
