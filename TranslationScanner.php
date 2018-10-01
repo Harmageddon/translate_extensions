@@ -4,6 +4,8 @@
  * @license    Apache License 2.0; see LICENSE
  */
 
+require_once 'Configuration.php';
+
 /**
  * Scans file system for translation files.
  *
@@ -87,6 +89,8 @@ class TranslationScanner
 			$this->error = 'Invalid path supplied: ' . $this->path . ' is not a directory.';
 		}
 
+		$config = Configuration::getInstance();
+
 		if ($this->component)
 		{
 			$this->usedAdmin = $this->sortUnique(
@@ -109,7 +113,8 @@ class TranslationScanner
 			if (is_dir($this->path . '/admin/language'))
 			{
 				$this->languageAdmin = $this->scanLanguages($this->path . '/admin/language');
-				$this->compareStrings($this->languageAdmin, $this->usedAdmin, $this->missingAdmin, $this->unusedAdmin);
+				$hidden = $config->getHiddenStrings($this->extensionName, 'admin');
+				$this->compareStrings($this->languageAdmin, $this->usedAdmin, $this->missingAdmin, $this->unusedAdmin, $hidden);
 
 				// TODO .sys.ini
 			}
@@ -121,7 +126,8 @@ class TranslationScanner
 			if (is_dir($this->path . '/site/language'))
 			{
 				$this->languageSite = $this->scanLanguages($this->path . '/site/language');
-				$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite);
+				$hidden = $config->getHiddenStrings($this->extensionName, 'site');
+				$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite, $hidden);
 			}
 			else
 			{
@@ -138,7 +144,8 @@ class TranslationScanner
 			);
 
 			$this->languageSite = $this->scanLanguages($this->path . '/language');
-			$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite);
+			$hidden = $config->getHiddenStrings($this->extensionName, 'site');
+			$this->compareStrings($this->languageSite, $this->usedSite, $this->missingSite, $this->unusedSite, $hidden);
 		}
 	}
 
@@ -419,7 +426,7 @@ class TranslationScanner
 	 *
 	 * @return   void  Values are returned by reference in the parameters.
 	 */
-	private function compareStrings($languageFiles, $used, &$missing, &$unused)
+	private function compareStrings($languageFiles, $used, &$missing, &$unused, $hidden)
 	{
 		foreach ($languageFiles as $language => $files)
 		{
@@ -433,9 +440,18 @@ class TranslationScanner
 					{
 						unset($languageFiles[$language][$file][$index]);
 					}
-					else
+					elseif (!in_array($string, $hidden))
 					{
 						array_push($missing[$language], $string);
+					}
+				}
+
+				// Remove hidden strings from defined strings.
+				foreach ($hidden as $string)
+				{
+					if (($index = array_search($string, $defined)) !== false)
+					{
+						unset($languageFiles[$language][$file][$index]);
 					}
 				}
 			}

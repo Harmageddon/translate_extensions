@@ -37,6 +37,11 @@ else
 	<script src="js/jquery-2.2.3.min.js"></script>
 	<script src="js/script.js"></script>
 	<link href="css/main.css" rel="stylesheet" type="text/css" />
+	<link href="css/fontawesome.min.css" rel="stylesheet" type="text/css" />
+	<link href="css/solid.min.css" rel="stylesheet" type="text/css" />
+	<script>
+		var extensionName = '<?php echo $_GET['extension']; ?>';
+	</script>
 </head>
 <body>
 <h1><?php echo $title; ?></h1>
@@ -124,7 +129,12 @@ else
 
 				foreach ($scanner->getMissingAdmin()[$language] as $string)
 				{
-					echo '<li>' . $string . '</li>';
+					echo '<li>'
+						. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="admin">'
+						. '<span class="fa fa-eye-slash"></span>'
+						. '</button> '
+						. $string
+						. '</li>';
 				}
 
 				echo '</ul>';
@@ -155,7 +165,12 @@ else
 
 			foreach ($scanner->getMissingSite()[$language] as $string)
 			{
-				echo '<li>' . $string . '</li>';
+				echo '<li>'
+					. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="site">'
+					. '<span class="fa fa-eye-slash"></span>'
+					. '</button> '
+					. $string
+					. '</li>';
 			}
 
 			echo '</ul>';
@@ -206,7 +221,12 @@ else
 
 					foreach ($strings as $string)
 					{
-						echo '<li>' . $string . '</li>';
+						echo '<li>'
+							. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="admin">'
+							. '<span class="fa fa-eye-slash"></span>'
+							. '</button> '
+							. $string
+							. '</li>';
 					}
 
 					echo '</ul></li>';
@@ -233,7 +253,12 @@ else
 
 				foreach ($strings as $string)
 				{
-					echo '<li>' . $string . '</li>';
+					echo '<li>'
+						. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="site">'
+						. '<span class="fa fa-eye-slash"></span>'
+						. '</button> '
+						. $string
+						. '</li>';
 				}
 
 				echo '</ul></li>';

@@ -12,5 +12,23 @@ $(document).ready(function () {
 		}
 
 		$(selector).toggleClass('hide');
-	})
+	});
+
+	$('.btn-hide').click(function () {
+		$.ajax({
+			url: 'ajax.php',
+			data: {
+				action: 'hide',
+				extension: extensionName,
+				scope: $(this).data('scope'),
+				value: $(this).data('string')
+			}
+		})
+			.done(function (data) {
+				if (data === '')
+				{
+					window.location.reload();
+				}
+			});
+	});
 });
