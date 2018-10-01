@@ -45,10 +45,15 @@ The strings for the `site` part are those found at these parts of the code base:
   - `admin/model/form`
   - `admin/models/fields`
   - `admin/models/forms`
+  
+### Hiding / Showing Strings
+
+If some language strings are detected as unused or missing, but you don't want them to appear in the list, because their current occurrence suits your application, you can hide them from the output. To do so, just click the small eye symbol next to the string.
+In order to show a hidden language string again, navigate to the configuration page for your extension and click on the eye symbol next to the string in the list of hidden strings.
 
 ## Please note...
 
-- The program only recognizes complete strings. If you have a construction like `JText::_('COM_MYCOMPONENT_TITLE_' . ($isNew ? 'NEW' : 'EDIT'))` and the two strings `COM_MYCOMPONENT_TITLE_NEW` and `COM_MYCOMPONENT_TITLE_EDIT` translated in your language files, the program will recognize `COM_MYCOMPONENT_TITLE_` as untranslated and `COM_MYCOMPONENT_TITLE_NEW` and `COM_MYCOMPONENT_TITLE_EDIT` as translated, but unused. 
+- The program only recognizes complete strings. If you have a construction like `JText::_('COM_MYCOMPONENT_TITLE_' . ($isNew ? 'NEW' : 'EDIT'))` and the two strings `COM_MYCOMPONENT_TITLE_NEW` and `COM_MYCOMPONENT_TITLE_EDIT` translated in your language files, the program will recognize `COM_MYCOMPONENT_TITLE_` as untranslated and `COM_MYCOMPONENT_TITLE_NEW` and `COM_MYCOMPONENT_TITLE_EDIT` as translated, but unused. You can hide these strings if you wish to (see [Hiding / Showing Strings](#hiding--showing-strings))
 - Depending on which parts of your extension are displayed where (especially concerning forms and parameters), it is possible that you don't need all language strings marked as *unused* in both language files (site and admin).
 - The support for `.sys.ini`files is not yet implemented.
 
