@@ -347,7 +347,7 @@ class TranslationScanner
 			return array();
 		}
 
-		$pattern = "/" . strtoupper($this->extensionName) . "_[A-Z_0-9]+/";
+		$pattern = "/" . strtoupper($this->extensionName) . "[A-Z_0-9]*/";
 
 		if (preg_match_all($pattern, $content, $matches))
 		{
@@ -389,7 +389,7 @@ class TranslationScanner
 			return array();
 		}
 
-		$pattern = "/^(" . strtoupper($this->extensionName) . "_[A-Z_0-9]+)=/";
+		$pattern = "/^(" . strtoupper($this->extensionName) . "[A-Z_0-9]*)=/";
 
 		while (($line = fgets($handle)) !== false)
 		{
@@ -423,6 +423,7 @@ class TranslationScanner
 	 * @param   array  $used           Array containing all strings used in the code base.
 	 * @param   array  $missing        Reference to an array where the function inserts all untranslated strings.
 	 * @param   array  $unused         Reference to an array where the function inserts all translated strings not used in the code base.
+	 * @param   array  $hidden         Language strings that should be ignored.
 	 *
 	 * @return   void  Values are returned by reference in the parameters.
 	 */
