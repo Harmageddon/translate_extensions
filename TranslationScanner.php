@@ -95,6 +95,7 @@ class TranslationScanner
 		{
 			$this->usedAdmin = $this->sortUnique(
 				array_merge(
+					$this->scanDirectory($this->path . '/', '.xml', false),
 					$this->scanDirectory($this->path . '/admin', '.php'),
 					$this->scanDirectory($this->path . '/admin', '.xml'),
 					$this->scanDirectory($this->path . '/site', '.xml')
@@ -152,12 +153,13 @@ class TranslationScanner
 	/**
 	 * Recursively searches for code files in a directory.
 	 *
-	 * @param   string  $path    Directory to be searched.
-	 * @param   string  $ending  File ending of the files to be returned.
+	 * @param   string   $path       Directory to be searched.
+	 * @param   string   $ending     File ending of the files to be returned.
+	 * @param   boolean  $recursive  Whether to recursively descend into directories.
 	 *
 	 * @return   array  One-dimensional array containing the paths to all files that have been found.
 	 */
-	public function scanDirectory($path, $ending)
+	public function scanDirectory($path, $ending, $recursive = true)
 	{
 		$strings = array();
 
@@ -174,7 +176,7 @@ class TranslationScanner
 
 					$filePath = $path . '/' . $file;
 
-					if (is_dir($filePath))
+					if (is_dir($filePath) && $recursive)
 					{
 						$strings = array_merge($strings, $this->scanDirectory($filePath, $ending));
 					}
