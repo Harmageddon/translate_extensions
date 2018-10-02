@@ -115,14 +115,39 @@ else
 
 			if (is_array($scanner->getLanguageSite()[$language]))
 			{
+				$translated = 0;
+				$missing = count($scanner->getMissingSite()[$language]);
+				$unused = array_reduce(
+					$scanner->getUnusedSite()[$language],
+					function ($carry, $item)
+					{
+						return $carry + count($item);
+					},
+					0
+				);
+
 				echo '<ul>';
 
 				foreach ($scanner->getLanguageSite()[$language] as $file => $strings)
 				{
-					echo '<li>' . $file . ' (' . count($strings) . ' strings)</li>';
+					$n = count($strings);
+					$translated += $n;
+					echo '<li>' . $file . ' (' . $n . ' strings)</li>';
 				}
 
 				echo '</ul>';
+
+				$max = $translated + $missing;
+				$translated -= $unused;
+				$good = round($translated / $max * 100, 3);
+				$bad = round($missing / $max * 100, 3);
+				$warn = 100 - $good - $bad;
+
+				echo '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' . $max . '" aria-valuenow="' . $translated . '">'
+					. '<div class="progress-bar success" style="width: ' . $good . '%" title="' . $translated . ' translated language strings"></div>'
+					. '<div class="progress-bar error" style="width: ' . $bad . '%" title="' . $missing . ' missing language strings"></div>'
+					. '<div class="progress-bar warning" style="width: ' . $warn . '%" title="' . $unused . ' unused language strings"></div>'
+					. '</div>';
 			}
 			else
 			{
