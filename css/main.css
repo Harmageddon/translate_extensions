@@ -1,7 +1,50 @@
+@font-face {
+	font-family: 'OpenSans Regular';
+	src: local('OpenSans Regular'),
+	url('../webfonts/OpenSans-Regular-webfont.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'OpenSans Semibold';
+	src: local('OpenSans Semibold'),
+	url('../webfonts/OpenSans-Semibold-webfont.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+
+}
+
 body {
 	margin: 0;
+	padding: 0;
+	font-family: 'OpenSans Regular', Helvetica, sans-serif;
+}
+
+.main {
 	padding: .5em;
-	font-family: sans-serif;
+}
+
+h1, h2, h3, th {
+	font-family: 'OpenSans Semibold', Helvetica, sans-serif;
+	font-weight: normal;
+}
+
+h1 {
+	font-size: 2em;
+	position: relative;
+	margin: 0;
+	padding: .2em .4em;
+	background-color: #222;
+	box-shadow: 0 -.4em .2em -.2em #000 inset;
+	color: #eee;
+}
+
+h2 {
+	font-size: 1.6em;
+}
+
+h3 {
+	font-size: 1.2em;
 }
 
 .hide {
@@ -75,4 +118,80 @@ form {
 .btn-hide:hover,
 .btn-show:hover {
 	color: #000;
+}
+
+.progress {
+	height: 0.8em;
+	background-color: #bbb;
+	border-radius: .2em;
+	display: flex;
+	box-shadow: 0 0 .1em #000;
+	overflow: hidden;
+	margin: .2em 0;
+}
+
+.progress-bar {
+	background-image: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0em, rgba(0, 0, 0, 0.2) 0.2em, rgba(0, 0, 0, 0) 0.2em, rgba(0, 0, 0, 0) 0.4em);
+}
+
+.success {
+	background-color: #007C00;
+}
+
+.primary {
+	background-color: #0D3A82;
+}
+
+.warning {
+	background-color: #F7A310;
+}
+
+.error {
+	background-color: #F71010;
+}
+
+.menu {
+	display: flex;
+}
+
+.menu a {
+	display: block;
+	flex: 1 0 auto;
+	text-decoration: none;
+	text-align: center;
+	color: #eee;
+	background-color: #222;
+	/*border: 1px solid #000;*/
+	border-right-width: 0;
+	padding: .5em .8em;
+	transition: all 0.5s ease;
+	position: relative;
+	background-size: 3em 3em;
+	background-position: center center;
+}
+
+.menu a:last-child {
+	/*border-right-width: 1px;*/
+}
+.menu a:hover {
+	box-shadow: .1em .1em .2em rgba(0, 0, 0, 0.4);
+	background-size: 4em 4em;
+}
+
+.menu a.active {
+	background-color: #444;
+}
+
+.menu .fa {
+	position: absolute;
+	font-size: 2em;
+	color: #bbb;
+}
+
+.menu a.scan {
+	background-image: url('../img/stethoscope.svg');
+}
+
+.menu a.configuration {
+	background-image: url('../img/cogs.svg');
 }

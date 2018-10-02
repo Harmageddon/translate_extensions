@@ -7,10 +7,11 @@ require_once 'TranslationScanner.php';
 
 if (isset($_GET['extension']))
 {
-	$scanner = new TranslationScanner($_GET['extension']);
+	$extension = filter_var($_GET['extension'], FILTER_SANITIZE_STRING);
+	$scanner = new TranslationScanner($extension);
 	$scanner->scanAll();
 
-	$title = 'Scan results for ' . $_GET['extension'];
+	$title = 'Scan Results for ' . $extension;
 
 	$thead = '<thead><tr><th width="10%">Language</th>';
 
@@ -39,20 +40,23 @@ else
 	<link href="css/main.css" rel="stylesheet" type="text/css" />
 	<link href="css/fontawesome.min.css" rel="stylesheet" type="text/css" />
 	<link href="css/solid.min.css" rel="stylesheet" type="text/css" />
+	<?php if (isset($extension)) : ?>
 	<script>
-		var extensionName = '<?php echo $_GET['extension']; ?>';
+		var extensionName = '<?php echo $extension; ?>';
 	</script>
+	<?php endif; ?>
 </head>
 <body>
 <h1><?php echo $title; ?></h1>
+<?php include 'menu.php'; ?>
+<div class="main">
 <?php if (isset($scanner)) :?>
 <?php if ($scanner->getError()) : ?>
-<h2>Error</h2>
-<p>
-	<?php echo $scanner->getError(); ?>
-</p>
+	<h2>Error</h2>
+	<p>
+		<?php echo $scanner->getError(); ?>
+	</p>
 <?php else : ?>
-<a href="configuration.php?extension=<?php echo $_GET['extension']; ?>">Configuration</a>
 
 <h2>Language files</h2>
 <table>
@@ -67,14 +71,37 @@ else
 		{
 			if (is_array($scanner->getLanguageAdmin()[$language]))
 			{
+				$translated = 0;
+				$missing = count($scanner->getMissingAdmin()[$language]);
+				$unused = array_reduce($scanner->getUnusedAdmin()[$language], function ($carry, $item)
+				{
+					return $carry + count($item);
+				},
+					0
+				);
+
 				echo '<ul>';
 
 				foreach ($scanner->getLanguageAdmin()[$language] as $file => $strings)
 				{
-					echo '<li>' . $file . ' (' . count($strings) . ' strings)' . '</li>';
+					$n = count($strings);
+					$translated += $n;
+					echo '<li>' . $file . ' (' . $n . ' strings)</li>';
 				}
 
 				echo '</ul>';
+
+				$max = $translated + $missing;
+				$translated -= $unused;
+				$good = round($translated / $max * 100, 3);
+				$bad = round($missing / $max * 100, 3);
+				$warn = 100 - $good - $bad;
+
+				echo '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' . $max . '" aria-valuenow="' . $translated . '">'
+					. '<div class="progress-bar success" style="width: ' . $good . '%" title="' . $translated . ' translated language strings"></div>'
+					. '<div class="progress-bar error" style="width: ' . $bad . '%" title="' . $missing . ' missing language strings"></div>'
+					. '<div class="progress-bar warning" style="width: ' . $warn . '%" title="' . $unused . ' unused language strings"></div>'
+					. '</div>';
 			}
 			else
 			{
@@ -90,7 +117,7 @@ else
 
 			foreach ($scanner->getLanguageSite()[$language] as $file => $strings)
 			{
-				echo '<li>' . $file . ' (' . count($strings) . ' strings)' . '</li>';
+				echo '<li>' . $file . ' (' . count($strings) . ' strings)</li>';
 			}
 
 			echo '</ul>';
@@ -293,5 +320,6 @@ else
 	</datalist>
 	<button type="submit">Load translation information</button>
 </form>
+</div>
 </body>
 </html>

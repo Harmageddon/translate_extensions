@@ -33,7 +33,8 @@ $title = 'Configuration for ' . $extension;
 </head>
 <body>
 <h1><?php echo $title; ?></h1>
-<a href="index.php?extension=<?php echo $extension; ?>">Scan Results</a>
+<?php include 'menu.php'; ?>
+<div class="main">
 <h2>Hidden Language Strings</h2>
 <?php
 if ($scanner->isComponent())
@@ -89,6 +90,6 @@ else
 	echo '</ul>';
 }
 ?>
-
+</div>
 </body>
 </html>
