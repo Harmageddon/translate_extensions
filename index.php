@@ -51,204 +51,114 @@ else
 <?php include 'menu.php'; ?>
 <div class="main">
 <?php if (isset($scanner)) :?>
-<?php if ($scanner->getError()) : ?>
-	<h2>Error</h2>
-	<p>
-		<?php echo $scanner->getError(); ?>
-	</p>
-<?php else : ?>
+	<?php if ($scanner->getError()) : ?>
+		<h2>Error</h2>
+		<p>
+			<?php echo $scanner->getError(); ?>
+		</p>
+	<?php else : ?>
 
-<h2>Language files</h2>
-<table>
-	<?php echo $thead; ?>
-	<tbody>
-	<?php
-	foreach ($scanner->getLanguages() as $language)
-	{
-		echo '<tr><td>' . $language . '</td><td>';
-
-		if ($scanner->isComponent())
+	<h2>Language files</h2>
+	<table>
+		<?php echo $thead; ?>
+		<tbody>
+		<?php
+		foreach ($scanner->getLanguages() as $language)
 		{
-			if (is_array($scanner->getLanguageAdmin()[$language]))
-			{
-				$translated = 0;
-				$missing = count($scanner->getMissingAdmin()[$language]);
-				$unused = array_reduce($scanner->getUnusedAdmin()[$language], function ($carry, $item)
-				{
-					return $carry + count($item);
-				},
-					0
-				);
+			echo '<tr><td>' . $language . '</td><td>';
 
+			if ($scanner->isComponent())
+			{
+				if (is_array($scanner->getLanguageAdmin()[$language]))
+				{
+					$translated = 0;
+					$missing = count($scanner->getMissingAdmin()[$language]);
+					$unused = array_reduce(
+						$scanner->getUnusedAdmin()[$language],
+						function ($carry, $item)
+						{
+								return $carry + count($item);
+						},
+						0
+					);
+
+					echo '<ul>';
+
+					foreach ($scanner->getLanguageAdmin()[$language] as $file => $strings)
+					{
+						$n = count($strings);
+						$translated += $n;
+						echo '<li>' . $file . ' (' . $n . ' strings)</li>';
+					}
+
+					echo '</ul>';
+
+					$max = $translated + $missing;
+					$translated -= $unused;
+					$good = round($translated / $max * 100, 3);
+					$bad = round($missing / $max * 100, 3);
+					$warn = 100 - $good - $bad;
+
+					echo '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' . $max . '" aria-valuenow="' . $translated . '">'
+						. '<div class="progress-bar success" style="width: ' . $good . '%" title="' . $translated . ' translated language strings"></div>'
+						. '<div class="progress-bar error" style="width: ' . $bad . '%" title="' . $missing . ' missing language strings"></div>'
+						. '<div class="progress-bar warning" style="width: ' . $warn . '%" title="' . $unused . ' unused language strings"></div>'
+						. '</div>';
+				}
+				else
+				{
+					echo 'No files found.';
+				}
+
+				echo '</td><td>';
+			}
+
+			if (is_array($scanner->getLanguageSite()[$language]))
+			{
 				echo '<ul>';
 
-				foreach ($scanner->getLanguageAdmin()[$language] as $file => $strings)
+				foreach ($scanner->getLanguageSite()[$language] as $file => $strings)
 				{
-					$n = count($strings);
-					$translated += $n;
-					echo '<li>' . $file . ' (' . $n . ' strings)</li>';
+					echo '<li>' . $file . ' (' . count($strings) . ' strings)</li>';
 				}
 
 				echo '</ul>';
-
-				$max = $translated + $missing;
-				$translated -= $unused;
-				$good = round($translated / $max * 100, 3);
-				$bad = round($missing / $max * 100, 3);
-				$warn = 100 - $good - $bad;
-
-				echo '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' . $max . '" aria-valuenow="' . $translated . '">'
-					. '<div class="progress-bar success" style="width: ' . $good . '%" title="' . $translated . ' translated language strings"></div>'
-					. '<div class="progress-bar error" style="width: ' . $bad . '%" title="' . $missing . ' missing language strings"></div>'
-					. '<div class="progress-bar warning" style="width: ' . $warn . '%" title="' . $unused . ' unused language strings"></div>'
-					. '</div>';
 			}
 			else
 			{
 				echo 'No files found.';
 			}
 
-			echo '</td><td>';
+
+			echo '</td>';
+			echo '</tr>';
 		}
+		?>
+		</tbody>
+	</table>
 
-		if (is_array($scanner->getLanguageSite()[$language]))
+	<h2>Missing strings</h2>
+	<table>
+		<?php echo $thead; ?>
+		<tbody>
+		<?php
+		foreach ($scanner->getLanguages() as $language)
 		{
-			echo '<ul>';
+			echo '<tr>';
+			echo '<td>' . $language . '</td>';
+			echo '<td>';
 
-			foreach ($scanner->getLanguageSite()[$language] as $file => $strings)
+			if ($scanner->isComponent())
 			{
-				echo '<li>' . $file . ' (' . count($strings) . ' strings)</li>';
-			}
-
-			echo '</ul>';
-		}
-		else
-		{
-			echo 'No files found.';
-		}
-
-
-		echo '</td>';
-		echo '</tr>';
-	}
-	?>
-	</tbody>
-</table>
-
-<h2>Missing strings</h2>
-<table>
-	<?php echo $thead; ?>
-	<tbody>
-	<?php
-	foreach ($scanner->getLanguages() as $language)
-	{
-		echo '<tr>';
-		echo '<td>' . $language . '</td>';
-		echo '<td>';
-
-		if ($scanner->isComponent())
-		{
-			if (empty($scanner->getMissingAdmin()[$language]))
-			{
-				echo '<p>Congratulations! No strings are missing.</p>';
-			}
-			else
-			{
-				echo '<ul>';
-
-				foreach ($scanner->getMissingAdmin()[$language] as $string)
+				if (empty($scanner->getMissingAdmin()[$language]))
 				{
-					echo '<li>'
-						. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="admin">'
-						. '<span class="fa fa-eye-slash"></span>'
-						. '</button> '
-						. $string
-						. '</li>';
+					echo '<p>Congratulations! No strings are missing.</p>';
 				}
-
-				echo '</ul>';
-
-				$className = 'missing-admin-' . $language;
-
-				echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
-				echo '<pre id="' . $className . '" class="hide">';
-
-				foreach ($scanner->getMissingAdmin()[$language] as $string)
+				else
 				{
-					echo $string . "=\"\"\n";
-				}
+					echo '<ul>';
 
-				echo '</pre>';
-			}
-
-			echo '</td><td>';
-		}
-
-		if (empty($scanner->getMissingSite()[$language]))
-		{
-			echo '<p>Congratulations! No strings are missing.</p>';
-		}
-		else
-		{
-			echo '<ul>';
-
-			foreach ($scanner->getMissingSite()[$language] as $string)
-			{
-				echo '<li>'
-					. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="site">'
-					. '<span class="fa fa-eye-slash"></span>'
-					. '</button> '
-					. $string
-					. '</li>';
-			}
-
-			echo '</ul>';
-
-			$className = 'missing-site-' . $language;
-
-			echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
-			echo '<pre id="' . $className . '" class="hide">';
-
-			foreach ($scanner->getMissingSite()[$language] as $string)
-			{
-				echo $string . "=\"\"\n";
-			}
-
-			echo '</pre>';
-		}
-
-		echo '</td></tr>';
-	}
-	?>
-	</tbody>
-</table>
-
-<h2>Unused strings</h2>
-<table>
-	<?php echo $thead; ?>
-	<tbody>
-	<?php
-	foreach ($scanner->getLanguages() as $language)
-	{
-		echo '<tr>';
-		echo '<td>' . $language . '</td>';
-		echo '<td>';
-
-		if ($scanner->isComponent())
-		{
-			if (empty($scanner->getUnusedAdmin()[$language]))
-			{
-				echo '<p>Congratulations! No unused strings found.</p>';
-			}
-			else
-			{
-				echo '<ul>';
-
-				foreach ($scanner->getUnusedAdmin()[$language] as $file => $strings)
-				{
-					echo '<li>' . $file . '<ul>';
-
-					foreach ($strings as $string)
+					foreach ($scanner->getMissingAdmin()[$language] as $string)
 					{
 						echo '<li>'
 							. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="admin">'
@@ -258,29 +168,33 @@ else
 							. '</li>';
 					}
 
-					echo '</ul></li>';
+					echo '</ul>';
+
+					$className = 'missing-admin-' . $language;
+
+					echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
+					echo '<pre id="' . $className . '" class="hide">';
+
+					foreach ($scanner->getMissingAdmin()[$language] as $string)
+					{
+						echo $string . "=\"\"\n";
+					}
+
+					echo '</pre>';
 				}
 
-				echo '</ul>';
+				echo '</td><td>';
 			}
 
-			echo '</td><td>';
-		}
-
-		else
-		{
-			echo '<ul>';
-
-			foreach ($scanner->getUnusedSite()[$language] as $file => $strings)
+			if (empty($scanner->getMissingSite()[$language]))
 			{
-				echo '<li>' . $file . '<ul>';
+				echo '<p>Congratulations! No strings are missing.</p>';
+			}
+			else
+			{
+				echo '<ul>';
 
-				if (empty($strings))
-				{
-					echo '<li>Congratulations! No unused strings found.</li>';
-				}
-
-				foreach ($strings as $string)
+				foreach ($scanner->getMissingSite()[$language] as $string)
 				{
 					echo '<li>'
 						. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="site">'
@@ -290,33 +204,121 @@ else
 						. '</li>';
 				}
 
-				echo '</ul></li>';
-			}
-		}
+				echo '</ul>';
 
-		echo '</td></tr>';
-	}
-	?>
-	</tbody>
-</table>
-<?php endif; ?>
+				$className = 'missing-site-' . $language;
+
+				echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
+				echo '<pre id="' . $className . '" class="hide">';
+
+				foreach ($scanner->getMissingSite()[$language] as $string)
+				{
+					echo $string . "=\"\"\n";
+				}
+
+				echo '</pre>';
+			}
+
+			echo '</td></tr>';
+		}
+		?>
+		</tbody>
+	</table>
+
+	<h2>Unused strings</h2>
+	<table>
+		<?php echo $thead; ?>
+		<tbody>
+		<?php
+		foreach ($scanner->getLanguages() as $language)
+		{
+			echo '<tr>';
+			echo '<td>' . $language . '</td>';
+			echo '<td>';
+
+			if ($scanner->isComponent())
+			{
+				if (empty($scanner->getUnusedAdmin()[$language]))
+				{
+					echo '<p>Congratulations! No unused strings found.</p>';
+				}
+				else
+				{
+					echo '<ul>';
+
+					foreach ($scanner->getUnusedAdmin()[$language] as $file => $strings)
+					{
+						echo '<li>' . $file . '<ul>';
+
+						foreach ($strings as $string)
+						{
+							echo '<li>'
+								. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="admin">'
+								. '<span class="fa fa-eye-slash"></span>'
+								. '</button> '
+								. $string
+								. '</li>';
+						}
+
+						echo '</ul></li>';
+					}
+
+					echo '</ul>';
+				}
+
+				echo '</td><td>';
+			}
+
+			else
+			{
+				echo '<ul>';
+
+				foreach ($scanner->getUnusedSite()[$language] as $file => $strings)
+				{
+					echo '<li>' . $file . '<ul>';
+
+					if (empty($strings))
+					{
+						echo '<li>Congratulations! No unused strings found.</li>';
+					}
+
+					foreach ($strings as $string)
+					{
+						echo '<li>'
+							. '<button type="button" class="btn btn-hide btn-nostyle" title="Hide this entry" data-string="' . $string . '" data-scope="site">'
+							. '<span class="fa fa-eye-slash"></span>'
+							. '</button> '
+							. $string
+							. '</li>';
+					}
+
+					echo '</ul></li>';
+				}
+			}
+
+			echo '</td></tr>';
+		}
+		?>
+		</tbody>
+	</table>
+	<?php endif; ?>
 <?php endif; ?>
 <form action="" method="get">
 	<label for="extension">Extension name:</label>
 	<input type="text" name="extension" id="extension" list="extensions" />
 	<datalist id="extensions">
-		<?php
-		$dir = __DIR__ . '/extensions/';
-		$files = scandir($dir);
+<?php
+$dir = __DIR__ . '/extensions/';
+$files = scandir($dir);
 
-		foreach ($files as $file)
-		{
-			if ($file != '.' && $file != '..' && is_dir($dir . $file))
-			{
-				echo '<option>' . $file . '</option>';
-			}
-		}
-		?>
+foreach ($files as $file)
+{
+	if ($file != '.' && $file != '..' && is_dir($dir . $file))
+	{
+		echo '<option>' . $file . '</option>';
+	}
+}
+?>
 	</datalist>
 	<button type="submit">Load translation information</button>
 </form>
