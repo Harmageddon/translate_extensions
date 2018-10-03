@@ -107,7 +107,7 @@ else
 				}
 				else
 				{
-					echo 'No files found.';
+					echo '<p>No language files found.</p>';
 				}
 
 				echo '</td><td>';
@@ -151,7 +151,7 @@ else
 			}
 			else
 			{
-				echo 'No files found.';
+				echo '<p>No language files found.</p>';
 			}
 
 
@@ -175,7 +175,11 @@ else
 
 			if ($scanner->isComponent())
 			{
-				if (empty($scanner->getMissingAdmin()[$language]))
+				if (!isset($scanner->getMissingAdmin()[$language]))
+				{
+					echo '<p>No language files found.</p>';
+				}
+				elseif (empty($scanner->getMissingAdmin()[$language]))
 				{
 					echo '<p>Congratulations! No strings are missing.</p>';
 				}
@@ -211,7 +215,11 @@ else
 				echo '</td><td>';
 			}
 
-			if (empty($scanner->getMissingSite()[$language]))
+			if (!isset($scanner->getMissingSite()[$language]))
+			{
+				echo '<p>No language files found.</p>';
+			}
+			elseif (empty($scanner->getMissingSite()[$language]))
 			{
 				echo '<p>Congratulations! No strings are missing.</p>';
 			}
@@ -263,17 +271,18 @@ else
 
 			if ($scanner->isComponent())
 			{
-				if (empty($scanner->getUnusedAdmin()[$language]))
-				{
-					echo '<p>Congratulations! No unused strings found.</p>';
-				}
-				else
+				if (isset($scanner->getUnusedAdmin()[$language]))
 				{
 					echo '<ul>';
 
 					foreach ($scanner->getUnusedAdmin()[$language] as $file => $strings)
 					{
 						echo '<li>' . $file . '<ul>';
+
+						if (empty($strings))
+						{
+							echo '<li>Congratulations! No unused strings found.</li>';
+						}
 
 						foreach ($strings as $string)
 						{
@@ -293,8 +302,12 @@ else
 
 				echo '</td><td>';
 			}
-
 			else
+			{
+				echo '<p>No language files found.</p>';
+			}
+
+			if (isset($scanner->getUnusedSite()[$language]))
 			{
 				echo '<ul>';
 
@@ -319,6 +332,10 @@ else
 
 					echo '</ul></li>';
 				}
+			}
+			else
+			{
+				echo '<p>No language files found.</p>';
 			}
 
 			echo '</td></tr>';
