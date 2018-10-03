@@ -20,7 +20,7 @@ body {
 	font-family: 'OpenSans Regular', Helvetica, sans-serif;
 }
 
-.main {
+.container {
 	padding: .5em;
 }
 
@@ -65,6 +65,11 @@ th {
 td {
 	padding: .3em;
 	border: 1px solid #ccc;
+	vertical-align: top;
+}
+td.first {
+	vertical-align: middle;
+	text-align: center;
 }
 tbody tr:nth-child(2n) {
 	background-color: #e5e5e5;
@@ -82,6 +87,7 @@ form {
 }
 
 .btn {
+	font-size: 1rem;
 	padding: .2em .5em;
 	cursor: pointer;
 	border: 1px solid rgba(0, 0, 0, 0.2);
@@ -92,13 +98,13 @@ form {
 }
 
 .btn:hover {
-	background-color: #f5f5f5;
+	background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
 	box-shadow: 0 0 .1em #000,
 	0 0 .2em #fff inset;
 }
 
 .btn:active {
-	background-color: #f5f5f5;
+	background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
 	box-shadow: 0 0 .1em #000,
 	0 0 .2em #000 inset;
 }
@@ -107,6 +113,7 @@ form {
 	background: transparent;
 	border-width: 0;
 	box-shadow: none;
+	padding: 0 .2em;
 }
 
 .btn-hide,
@@ -118,6 +125,40 @@ form {
 .btn-hide:hover,
 .btn-show:hover {
 	color: #000;
+}
+
+input {
+	font-size: 1rem;
+	padding: .2em .4em;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: .2em;
+}
+
+label {
+	margin-right: .3em;
+}
+
+.input-append {
+	font-size: 0;
+}
+
+.input-append * {
+	font-size: 1rem;
+}
+
+.input-append .btn {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.input-append input {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+textarea {
+	display: block;
+	max-width: 100%;
 }
 
 .progress {
@@ -139,7 +180,8 @@ form {
 }
 
 .primary {
-	background-color: #0D3A82;
+	background-color: #194EA3;
+	color: #fff;
 }
 
 .warning {
@@ -194,4 +236,11 @@ form {
 
 .menu a.configuration {
 	background-image: url('../img/cogs.svg');
+}
+
+.spacer {
+	background-color: #222;
+	box-shadow: 0 .5em .5em -.5em #000 inset,
+		0 -.5em .5em -.5em #000 inset;
+	height: 1.5em;
 }

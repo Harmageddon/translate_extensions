@@ -49,7 +49,7 @@ else
 <body>
 <h1><?php echo $title; ?></h1>
 <?php include 'menu.php'; ?>
-<div class="main">
+<div class="container">
 <?php if (isset($scanner)) :?>
 	<?php if ($scanner->getError()) : ?>
 		<h2>Error</h2>
@@ -58,14 +58,14 @@ else
 		</p>
 	<?php else : ?>
 
-	<h2>Language files</h2>
+	<h2>Language Files</h2>
 	<table>
 		<?php echo $thead; ?>
 		<tbody>
 		<?php
 		foreach ($scanner->getLanguages() as $language)
 		{
-			echo '<tr><td>' . $language . '</td><td>';
+			echo '<tr><td class="first">' . $language . '</td><td>';
 
 			if ($scanner->isComponent())
 			{
@@ -162,7 +162,7 @@ else
 		</tbody>
 	</table>
 
-	<h2>Missing strings</h2>
+	<h2>Missing Strings</h2>
 	<table>
 		<?php echo $thead; ?>
 		<tbody>
@@ -170,7 +170,7 @@ else
 		foreach ($scanner->getLanguages() as $language)
 		{
 			echo '<tr>';
-			echo '<td>' . $language . '</td>';
+			echo '<td class="first">' . $language . '</td>';
 			echo '<td>';
 
 			if ($scanner->isComponent())
@@ -201,15 +201,15 @@ else
 
 					$className = 'missing-admin-' . $language;
 
-					echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
-					echo '<pre id="' . $className . '" class="hide">';
+					echo '<button class="toggle btn" data-toggle="#' . $className . '" type="button">Show as language file</button>';
+					echo '<textarea id="' . $className . '" class="hide" rows="8" cols="50">';
 
 					foreach ($scanner->getMissingAdmin()[$language] as $string)
 					{
 						echo $string . "=\"\"\n";
 					}
 
-					echo '</pre>';
+					echo '</textarea>';
 				}
 
 				echo '</td><td>';
@@ -241,15 +241,15 @@ else
 
 				$className = 'missing-site-' . $language;
 
-				echo '<button class="toggle" data-toggle="#' . $className . '" type="button">Show as language file</button>';
-				echo '<pre id="' . $className . '" class="hide">';
+				echo '<button class="toggle btn" data-toggle="#' . $className . '" type="button">Show as language file</button>';
+				echo '<textarea id="' . $className . '" class="hide" rows="8" cols="50">';
 
 				foreach ($scanner->getMissingSite()[$language] as $string)
 				{
 					echo $string . "=\"\"\n";
 				}
 
-				echo '</pre>';
+				echo '</textarea>';
 			}
 
 			echo '</td></tr>';
@@ -258,7 +258,7 @@ else
 		</tbody>
 	</table>
 
-	<h2>Unused strings</h2>
+	<h2>Unused Strings</h2>
 	<table>
 		<?php echo $thead; ?>
 		<tbody>
@@ -266,7 +266,7 @@ else
 		foreach ($scanner->getLanguages() as $language)
 		{
 			echo '<tr>';
-			echo '<td>' . $language . '</td>';
+			echo '<td class="first">' . $language . '</td>';
 			echo '<td>';
 
 			if ($scanner->isComponent())
@@ -344,9 +344,13 @@ else
 		</tbody>
 	</table>
 	<?php endif; ?>
+</div>
+<div class="spacer"></div>
+<div class="container">
+<h2>Scan Another Extension</h2>
 <?php endif; ?>
 <form action="" method="get">
-	<label for="extension">Extension name:</label>
+	<label for="extension">Extension Name:</label>
 	<input type="text" name="extension" id="extension" list="extensions" />
 	<datalist id="extensions">
 <?php
@@ -362,7 +366,7 @@ foreach ($files as $file)
 }
 ?>
 	</datalist>
-	<button type="submit">Load translation information</button>
+	<button type="submit" class="btn primary">Load Translation Information</button>
 </form>
 </div>
 </body>

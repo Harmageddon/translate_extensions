@@ -34,7 +34,7 @@ $title = 'Configuration for ' . $extension;
 <body>
 <h1><?php echo $title; ?></h1>
 <?php include 'menu.php'; ?>
-<div class="main">
+<div class="container">
 <h2>Hidden Language Strings</h2>
 <?php
 if ($scanner->isComponent())
